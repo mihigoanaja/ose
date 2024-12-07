@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="header.css">
+		<title>OSE - Search Results</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+			.result {
+				margin-bottom: 20px;
+				padding: 10px;
+				border-bottom: 1px solid #ccc;
+			}
+			.result {
+					background-color: #fff;
+					border: 1px solid #ddd;
+					border-radius: 10px;
+					box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+					margin: 20px;
+					padding: 20px;
+					width: 300px;
+			}
+			.description {
+					overflow: hidden;
+					display: -webkit-box;
+					-webkit-box-orient: vertical;
+					-webkit-line-clamp: 3;
+			}
+			.results {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+			}
+			.results .result .placeholder {
+				background-color: #bbb;
+				width: 100%;
+				height: 30px;
+				border-radius: 30px;
+				background-image: linear-gradient(45deg, #666, #0000);
+				animation: load 0.2s;
+				animation-iteration-count: infinite;
+			}
+			@keyframes load {
+				0% {
+					background-attachment: fixed;
+				}
+				100% {
+					background-attachment: local;
+				}
+			}
+			header {
+				background-color: {{header-bg}};
+			}
+			header .header-top {
+				padding: 20px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			@media (orientation: portrait) {
+				header .header-top {
+					flex-direction: column;
+					justify-content: center;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<div class="header-top">
+				<h1>OSE - Open Search Engine</h1>
+				{% if 1 == 2 %}
+				<nav>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+						<li><a href="#">About</a></li>
+						<li><a href="#">Help</a></li>
+					</ul>
+				</nav>
+				{% endif %}
+			</div>
+			<form>
+				<input type="search" id="searchQ" name="q" placeholder="Search..." value="{{search-query}}">
+				<button type="submit">Search</button>
+			</form>
+		</header>
+		<div class="results" id="results">
+			{% for bone in skeletons %}
+				<div class="result">
+					<h2 class="placeholder"></h2>
+					<p class="description placeholder"></p>
+					<p class="description placeholder"></p>
+				</div>
+			{% endfor %}
+		</div>
+		<script>
+			fetch('https://atinas.alreflections.net/search/api.php?q='+(getParam("q")||""))
+				.then(response => response.json())
+				.then(data => {
+					const resultsContainer = document.getElementById('results');
+					resultsContainer.innerHTML= '';
+					data.forEach(result => {
+						r=result.description;
+						const resultHTML = `
+							<div class="result">
+								<h2>${result.title}<\/h2>
+								<p class="description">${result.description}<\/p>
+								<a href="${result.link}" target="_blank">Read More<\/a>
+							<\/div>
+						`;
+						resultsContainer.innerHTML += resultHTML;
+					});
+				})
+				.catch(error => console.error('Error:', error));
+			function getParam(x) {
+				var paramArray=window.location.search.replace("?","");
+				paramArray=paramArray.replaceAll("=","&");
+				paramArray=paramArray.split("&");
+				if ((paramArray.includes(x))&&(!(paramArray.indexOf(x)%2)))	return paramArray[paramArray.indexOf(x)+1];
+			}
+		</script>
+	</body>
+	<script src="RelativeJS-1.0.0.js"></script>
+	<script src="getParam.js"></script>
+    <script>
+		page.setList("skeletons",[1,2,3,4,5,6,7,8,9]);
+		page.setItem("search-query","");
+		page.setItem("header-bg","#257");
+		getParam("q")&&page.setItem("search-query",decodeURIComponent(getParam("q").replaceAll('+',' ')));
+		//console.clear();
+	</script>
+</html>
